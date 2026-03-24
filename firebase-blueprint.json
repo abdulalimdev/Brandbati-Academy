@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile with role and status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "teacher", "student", "parent"] },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "paidStatus": { "type": "string", "enum": ["pending", "paid", "unpaid"] },
+        "studentId": { "type": "string", "description": "Linked student ID for parents" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "exams": {
+      "title": "Exam",
+      "description": "Exam details created by teachers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "published": { "type": "boolean" },
+        "duration": { "type": "integer", "description": "Duration in minutes" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "teacherId", "duration"]
+    },
+    "questions": {
+      "title": "Question",
+      "description": "MCQ question for an exam",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "examId": { "type": "string" },
+        "text": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctOptionIndex": { "type": "integer" },
+        "marks": { "type": "integer" }
+      },
+      "required": ["examId", "text", "options", "correctOptionIndex", "marks"]
+    },
+    "attempts": {
+      "title": "Attempt",
+      "description": "Student exam attempt and result",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "examId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "score": { "type": "integer" },
+        "totalMarks": { "type": "integer" },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "answers": { "type": "object", "description": "Map of questionId to selected option index" }
+      },
+      "required": ["examId", "studentId", "score", "totalMarks", "submittedAt"]
+    },
+    "payments": {
+      "title": "Payment",
+      "description": "Student payment submission",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "transactionId": { "type": "string" },
+        "method": { "type": "string", "enum": ["bkash", "nagad"] },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "verified", "rejected"] },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "transactionId", "method", "amount", "status", "submittedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "users", "description": "User profiles" },
+    "/exams/{examId}": { "schema": "exams", "description": "Exams" },
+    "/exams/{examId}/questions/{questionId}": { "schema": "questions", "description": "Exam questions" },
+    "/attempts/{attemptId}": { "schema": "attempts", "description": "Exam attempts" },
+    "/payments/{paymentId}": { "schema": "payments", "description": "Payment records" }
+  }
+}
